@@ -23,10 +23,10 @@ function createInvoice(invoice, path, res, recieptData, invoiceID) {
 
 function generateHeader(doc) {
   doc
-    .image("https://img.freepik.com/free-vector/colorful-bird-illustration-gradient_343694-1741.jpg", 50, 45, { width: 50 })
+    // .image("https://img.freepik.com/free-vector/colorful-bird-illustration-gradient_343694-1741.jpg", 50, 45, { width: 50 })
     .fillColor("#444444")
     .fontSize(20)
-    .text("DY Nutrition", 110, 57)
+    .text("DY Nutrition", 50, 57)
     .fontSize(10)
     .text("Jadhavnagar, Wadgaon", 200, 50, { align: "right" })
     .text("Pune - 411041", 200, 65, { align: "right" })
@@ -38,12 +38,12 @@ function generateCustomerInformation(doc, invoice, invoiceID, recieptData) {
     let str = moment(Number(invoiceID)).format("MMM DD, YYYY hh:mm a");
   doc
     .fillColor("#444444")
-    .fontSize(20)
-    .text("Invoice", 50, 160);
+    .fontSize(15)
+    .text("Invoice", 50, 100);
 
-  generateHr(doc, 185);
+  generateHr(doc, 125);
 
-  const customerInformationTop = 200;
+  const customerInformationTop = 140;
 
   doc
     .fontSize(10)
@@ -71,12 +71,12 @@ function generateCustomerInformation(doc, invoice, invoiceID, recieptData) {
     )
     .moveDown();
 
-  generateHr(doc, 260);
+  generateHr(doc, 200);
 }
 
 function generateInvoiceTable(doc, invoice, recieptData) {
   let i;
-  const invoiceTableTop = 300;
+  const invoiceTableTop = 230;
 
   doc.font("Helvetica-Bold");
   generateTableRow(
