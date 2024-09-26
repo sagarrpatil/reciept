@@ -14,7 +14,7 @@ function createInvoice(invoice, path, res, recieptData, invoiceID) {
 
   generateHeader(doc);
   generateCustomerInformation(doc, invoice, invoiceID, recieptData);
-  generateInvoiceTable(doc, invoice);
+  generateInvoiceTable(doc, invoice, recieptData);
   generateFooter(doc);
   doc.pipe(res);
   doc.end();
@@ -53,9 +53,9 @@ function generateCustomerInformation(doc, invoice, invoiceID, recieptData) {
     .font("Helvetica")
     .text("Invoice Date:", 50, customerInformationTop + 15)
     .text(str, 150, customerInformationTop + 15)
-    .text("Balance Due:", 50, customerInformationTop + 30)
+    .text("Receipter Name:", 50, customerInformationTop + 30)
     .text(
-      "Rs " + recieptData.balance,
+        recieptData.receipterName,
       150,
       customerInformationTop + 30
     )
@@ -68,44 +68,44 @@ function generateCustomerInformation(doc, invoice, invoiceID, recieptData) {
         "Transaction Mode: "+ recieptData.paymentOption,
       300,
       customerInformationTop + 30
-    ) .text(
-        "Receipter Name: "+ recieptData.receipterName,
-      300,
-      customerInformationTop + 45
     )
     .moveDown();
 
   generateHr(doc, 260);
 }
 
-function generateInvoiceTable(doc, invoice) {
+function generateInvoiceTable(doc, invoice, recieptData) {
   let i;
-  const invoiceTableTop = 330;
+  const invoiceTableTop = 300;
 
   doc.font("Helvetica-Bold");
   generateTableRow(
     doc,
     invoiceTableTop,
+    "Sr",
     "Item",
-    "Description",
-    "Unit Cost",
-    "Quantity",
-    "Line Total"
+    "MRP",
+    "Disc",
+    "Qty",
+    "Rate",
+    "Total"
   );
   generateHr(doc, invoiceTableTop + 20);
   doc.font("Helvetica");
 
-  for (i = 0; i < invoice.items.length; i++) {
-    const item = invoice.items[i];
+  for (i = 0; i < recieptData.Cart.length; i++) {
+    const item = recieptData.Cart[i];
     const position = invoiceTableTop + (i + 1) * 30;
     generateTableRow(
       doc,
       position,
-      item.item,
-      item.description,
-      formatCurrency(item.amount / item.quantity),
-      item.quantity,
-      formatCurrency(item.amount)
+      i+1,
+      item.name,
+      item.mrpOfProduct,
+      item.mrpOfProduct - item.sellPrice,
+      item.buyingQty,
+      item.sellPrice,
+      item.buyingQty * item.sellPrice
     );
 
     generateHr(doc, position + 20);
@@ -117,9 +117,11 @@ function generateInvoiceTable(doc, invoice) {
     subtotalPosition,
     "",
     "",
-    "Subtotal",
     "",
-    formatCurrency(invoice.subtotal)
+    "",
+    "",
+    "Total Amount",
+    "Rs. " + Number(recieptData.totalAmmount)
   );
 
   const paidToDatePosition = subtotalPosition + 20;
@@ -128,21 +130,26 @@ function generateInvoiceTable(doc, invoice) {
     paidToDatePosition,
     "",
     "",
-    "Paid To Date",
     "",
-    formatCurrency(invoice.paid)
+    "",
+    "",
+    "Paid Amount",
+    "Rs. " + Number(recieptData.totalAmmount - recieptData.balance)
   );
 
   const duePosition = paidToDatePosition + 25;
   doc.font("Helvetica-Bold");
+  if(recieptData.balance)
   generateTableRow(
     doc,
     duePosition,
     "",
     "",
-    "Balance Due",
     "",
-    formatCurrency(invoice.subtotal - invoice.paid)
+    "",
+    "",
+    "Balance Due",
+    "Rs. " + Number(recieptData.balance)
   );
   doc.font("Helvetica");
 }
@@ -151,7 +158,7 @@ function generateFooter(doc) {
   doc
     .fontSize(10)
     .text(
-      "Payment is due within 15 days. Thank you for your business.",
+      "No Return and no Replace",
       50,
       780,
       { align: "center", width: 500 }
@@ -159,21 +166,27 @@ function generateFooter(doc) {
 }
 
 function generateTableRow(
-  doc,
-  y,
-  item,
-  description,
-  unitCost,
-  quantity,
-  lineTotal
+    doc,
+    y,
+    item,
+    name,
+    mrpOfProduct,
+    disc,
+    buyingQty,
+    sellPrice,
+    total
 ) {
   doc
     .fontSize(10)
     .text(item, 50, y)
-    .text(description, 150, y)
-    .text(unitCost, 280, y, { width: 90, align: "right" })
-    .text(quantity, 370, y, { width: 90, align: "right" })
-    .text(lineTotal, 0, y, { align: "right" });
+    .text(name, 70, y)
+    .text(mrpOfProduct, 170, y, { width: 90, align: "right" })
+    // .text(disc, 200, y, { align: "right" })
+    .text(disc, 230, y, { width: 90, align: "right" })
+    .text(buyingQty, 300, y, { width: 90, align: "right" })
+    .text(sellPrice, 350, y, { width: 90, align: "right" })
+    .text(total, 420, y, { width: 90, align: "right" });
+
 }
 
 function generateHr(doc, y) {
@@ -189,13 +202,7 @@ function formatCurrency(cents) {
   return "$" + (cents / 100).toFixed(2);
 }
 
-function formatDate(date) {
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
 
-  return year + "/" + month + "/" + day;
-}
 
 module.exports = {
   createInvoice
