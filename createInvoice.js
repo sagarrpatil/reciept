@@ -26,7 +26,7 @@ function generateHeader(doc) {
     // .image("https://img.freepik.com/free-vector/colorful-bird-illustration-gradient_343694-1741.jpg", 50, 45, { width: 50 })
     .fillColor("#444444")
     .fontSize(20)
-    .text("DY Nutrition", 50, 57)
+    .text("DY Nutritions", 50, 57)
     .fontSize(10)
     .text("Jadhavnagar, Wadgaon", 200, 50, { align: "right" })
     .text("Pune - 411041", 200, 65, { align: "right" })
