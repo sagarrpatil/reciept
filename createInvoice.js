@@ -112,7 +112,21 @@ function generateInvoiceTable(doc, invoice, recieptData) {
     generateHr(doc, position + 20);
   }
 
-  const subtotalPosition = invoiceTableTop + (i + 1) * 30;
+  let subtotalPosition = invoiceTableTop + (i + 1) * 30;
+  if(recieptData?.checkedAddittional){
+    subtotalPosition += 20
+  generateTableRow(
+    doc,
+    invoiceTableTop + (i + 1) * 30,
+    "",
+    "",
+    "",
+    "",
+    "",
+    recieptData.checkedAddittional.type +" Fee",
+    "Rs. " + Number(recieptData.checkedAddittional.amount)
+  );
+}
   generateTableRow(
     doc,
     subtotalPosition,
