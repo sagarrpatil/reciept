@@ -4,7 +4,7 @@ const moment = require('moment');
 function createInvoice(invoice, path, res, recieptData, invoiceID) {
     const { customerName, phoneNumber, receipterName, paymentMode, paymentOption, totalAmount, partialPayment, balance, checkedAdditional, Cart } = recieptData;
   let doc = new PDFDocument({ size: "A4", margin: 50 });
-  let filename = `receipt_${invoice}.pdf`;
+  let filename = `receipt_${customerName}_${invoiceID}.pdf`;
     
   // Set headers to open in the browser
   res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
@@ -86,8 +86,8 @@ function generateInvoiceTable(doc, invoice, recieptData) {
     "Item",
     "MRP",
     "Disc",
-    "Qty",
     "Rate",
+    "Qty",
     "Total"
   );
   generateHr(doc, invoiceTableTop + 20);
@@ -102,9 +102,10 @@ function generateInvoiceTable(doc, invoice, recieptData) {
       i+1,
       item.name,
       item.mrpOfProduct,
-      item.mrpOfProduct - item.sellPrice,
-      item.buyingQty,
+      Number((item.sellPrice/item.mrpOfProduct)*100).toFixed(0) + "%",
       item.sellPrice,
+      item.buyingQty,
+    
       item.buyingQty * item.sellPrice
     );
 
@@ -158,7 +159,7 @@ function generateFooter(doc) {
   doc
     .fontSize(10)
     .text(
-      "No Return and no Replace",
+      "No Return and No Replace",
       50,
       780,
       { align: "center", width: 500 }

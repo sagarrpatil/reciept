@@ -67,7 +67,7 @@ app.get('/invoice/:id/:invoiceID', async (req, res) => {
         if (!recieptData) {
             return res.status(404).send('Receipt not found');
         }
-        createInvoice(invoice, invoiceID +"invoice.pdf", res, recieptData, invoiceID);
+        createInvoice(invoice, "invoice.pdf", res, recieptData, invoiceID);
 } catch (error) {
         console.error("Error fetching events:", error);
         res.status(500).json({ error: "Internal Server Error" });
