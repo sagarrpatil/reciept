@@ -21,6 +21,7 @@ function createInvoice(invoice, path, res, recieptData, invoiceID) {
 
 function generateHeader(doc) {
     doc
+        // .image("https://img.freepik.com/free-vector/colorful-bird-illustration-gradient_343694-1741.jpg", 50, 45, { width: 50 })
         .fillColor("#444444")
         .fontSize(20)
         .text("DY Nutritions", 50, 57)
@@ -51,91 +52,152 @@ function generateCustomerInformation(doc, invoice, invoiceID, recieptData) {
         .text("Invoice Date:", 50, customerInformationTop + 15)
         .text(str, 150, customerInformationTop + 15)
         .text("Receipter Name:", 50, customerInformationTop + 30)
-        .text(recieptData.receipterName, 150, customerInformationTop + 30)
+        .text(
+            recieptData.receipterName,
+            150,
+            customerInformationTop + 30
+        )
         .font("Helvetica-Bold")
         .text(recieptData.customerName, 300, customerInformationTop)
         .font("Helvetica")
         .text("+91 " + recieptData.phoneNumber, 300, customerInformationTop + 15)
-        .text("Transaction Mode: " + recieptData.paymentOption, 300, customerInformationTop + 30)
+        .text(
+            "Transaction Mode: "+ recieptData.paymentOption,
+            300,
+            customerInformationTop + 30
+        )
         .moveDown();
 
     generateHr(doc, 200);
 }
 
 function generateInvoiceTable(doc, invoice, recieptData) {
+    let i;
     const invoiceTableTop = 230;
+
     doc.font("Helvetica-Bold");
-    generateTableRow(doc, invoiceTableTop, "Sr", "Item", "MRP", "Disc", "Rate", "Qty", "Total");
+    generateTableRow(
+        doc,
+        invoiceTableTop,
+        "Sr",
+        "Item",
+        "MRP",
+        "Disc",
+        "Rate",
+        "Qty",
+        "Total"
+    );
     generateHr(doc, invoiceTableTop + 20);
     doc.font("Helvetica");
 
-    let positionY = invoiceTableTop + 20;
-
-    for (let i = 0; i < recieptData.Cart.length; i++) {
+    for (i = 0; i < recieptData.Cart.length; i++) {
         const item = recieptData.Cart[i];
-        positionY += generateTableRow(doc, positionY, i + 1, item.name, item.mrpOfProduct, 
-            (100 - Number((item.sellPrice / item.mrpOfProduct) * 100).toFixed(0)) + "%", 
-            item.sellPrice, item.buyingQty, item.buyingQty * item.sellPrice);
+        const position = invoiceTableTop + (i + 1) * 30;
+        generateTableRow(
+            doc,
+            position,
+            i+1,
+            item.name,
+            item.mrpOfProduct,
+            (100 - Number((item.sellPrice/item.mrpOfProduct)*100).toFixed(0)) + "%",
+            item.sellPrice,
+            item.buyingQty,
+            item.buyingQty * item.sellPrice
+        );
+
+        generateHr(doc, position + 20);
     }
 
-    let subtotalPosition = positionY + 20;
-
-    if (recieptData?.checkedAdditional) {
+    let subtotalPosition = invoiceTableTop + (i + 1) * 30;
+    if(recieptData?.checkedAddittional){
         subtotalPosition += 20;
-        generateTableRow(doc, subtotalPosition, "", "", "", "", "", recieptData.checkedAdditional.type + " Fee", 
-            "Rs. " + Number(recieptData.checkedAdditional.amount));
+        generateTableRow(
+            doc,
+            invoiceTableTop + (i + 1) * 30,
+            "",
+            "",
+            "",
+            "",
+            "",
+            recieptData.checkedAddittional.type +" Fee",
+            "Rs. " + Number(recieptData.checkedAddittional.amount)
+        );
     }
-
-    generateTableRow(doc, subtotalPosition, "", "", "", "", "", "Total Amount", 
-        "Rs. " + Number(recieptData.totalAmount));
+    generateTableRow(
+        doc,
+        subtotalPosition,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Total Amount",
+        "Rs. " + Number(recieptData.totalAmmount)
+    );
 
     const paidToDatePosition = subtotalPosition + 20;
-    generateTableRow(doc, paidToDatePosition, "", "", "", "", "", "Paid Amount", 
-        "Rs. " + Number(recieptData.totalAmount - recieptData.balance));
+    generateTableRow(
+        doc,
+        paidToDatePosition,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Paid Amount",
+        "Rs. " + Number(recieptData.totalAmmount - recieptData.balance)
+    );
 
     const duePosition = paidToDatePosition + 25;
     doc.font("Helvetica-Bold");
-    if (recieptData.balance) {
-        generateTableRow(doc, duePosition, "", "", "", "", "", "Balance Due", 
-            "Rs. " + Number(recieptData.balance));
-    }
+    if(recieptData.balance)
+    generateTableRow(
+        doc,
+        duePosition,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Balance Due",
+        "Rs. " + Number(recieptData.balance)
+    );
     doc.font("Helvetica");
 }
 
 function generateFooter(doc) {
     doc
         .fontSize(10)
-        .text("No Return and No Replace", 50, 780, { align: "center", width: 500 });
+        .text(
+            "No Return and No Replace",
+            50,
+            780,
+            { align: "center", width: 500 }
+        );
 }
 
-function generateTableRow(doc, y, item, name, mrpOfProduct, disc, buyingQty, sellPrice, total) {
-    const rowHeight = 30; // Height of each row
-    const nameWidth = 90; // Maximum width for item name
+function generateTableRow(
+    doc,
+    y,
+    item,
+    name,
+    mrpOfProduct,
+    disc,
+    buyingQty,
+    sellPrice,
+    total
+) {
+    doc
+        .fontSize(10)
+        .text(item, 50, y)
+        .text(name, 70, y)
+        .text(mrpOfProduct, 170, y, { width: 90, align: "right" })
+        // .text(disc, 200, y, { align: "right" })
+        .text(disc, 230, y, { width: 90, align: "right" })
+        .text(buyingQty, 300, y, { width: 90, align: "right" })
+        .text(sellPrice, 350, y, { width: 90, align: "right" })
+        .text(total, 420, y, { width: 90, align: "right" });
 
-    // Draw item number
-    doc.fontSize(10).text(item, 50, y);
-
-    // Draw item name and handle wrapping
-    const nameLines = doc.text(name, 70, y, { width: nameWidth, align: "left" }).split("\n");
-    const linesCount = nameLines.length;
-
-    // Adjust the Y position for additional lines
-    for (let i = 0; i < linesCount; i++) {
-        doc.text(nameLines[i], 70, y + i * 15); // Use 15 as line height
-    }
-
-    // Update the Y position for next row
-    y += linesCount * 15;
-
-    // Draw remaining details
-    doc.text(mrpOfProduct, 170, y, { width: 90, align: "right" });
-    doc.text(disc, 230, y, { width: 90, align: "right" });
-    doc.text(buyingQty, 300, y, { width: 90, align: "right" });
-    doc.text(sellPrice, 350, y, { width: 90, align: "right" });
-    doc.text(total, 420, y, { width: 90, align: "right" });
-
-    // Return the new y position for the next row
-    return rowHeight + (linesCount - 1) * 15; // Adjust for number of lines in the item name
 }
 
 function generateHr(doc, y) {
