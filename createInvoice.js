@@ -102,7 +102,7 @@ function generateInvoiceTable(doc, invoice, recieptData) {
       i+1,
       item.name,
       item.mrpOfProduct,
-      Number((item.sellPrice/item.mrpOfProduct)*100).toFixed(0) + "%",
+      (100 - Number((item.sellPrice/item.mrpOfProduct)*100).toFixed(0)) + "%",
       item.sellPrice,
       item.buyingQty,
     
